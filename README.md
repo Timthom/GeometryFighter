@@ -16,7 +16,7 @@ Just for learning iOS Scenekit 3D game modeling.
 * Dependencies Xcode 7.3.1
 * Deployment instruktions
 
-Download project and run it in Xcode. Use either simulater, but prefearably an iOS device for better rendering.
+Download project and run it in Xcode. Use either simulater, but preferably an iOS device for better rendering.
 
 
 ### Who do I talk to? ###
