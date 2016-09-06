@@ -14,7 +14,8 @@ Just for learning iOS Scenekit 3D game modeling.
 * Summary of set up
 * Configuration
 * Dependencies Xcode 7.3.1
-* Deployment instructions
+* Deployment instruktions
+
 Download project and run it in Xcode. Use either simulater, but prefearably an iOS device for better rendering.
 
 
