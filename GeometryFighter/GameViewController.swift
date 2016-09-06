@@ -8,19 +8,25 @@
 
 import UIKit
 import SceneKit
+
 class GameViewController: UIViewController {
     
     var scnView: SCNView!
     var scnScene: SCNScene!
     var cameraNode: SCNNode!
     var spawnTime:NSTimeInterval = 0
+    var game = GameHelper.sharedInstance
+    var splashNodes:[String:SCNNode] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
         setupScene()
         setupCamera()
-        spawnShape()
+        //spawnShape()
+        setupHUD()
+        setupSplash()
+        setupSounds()
     }
     override func shouldAutorotate() -> Bool {
         return true
@@ -31,9 +37,9 @@ class GameViewController: UIViewController {
     func setupView() {
         scnView = self.view as! SCNView
         // 1
-        scnView.showsStatistics = true
+       // scnView.showsStatistics = true
         // 2
-        scnView.allowsCameraControl = true
+       // scnView.allowsCameraControl = false
         // 3
         scnView.autoenablesDefaultLighting = true
         // 4 Calling rendering-loop extention to view
@@ -80,11 +86,13 @@ class GameViewController: UIViewController {
             geometry = SCNTube(innerRadius: 0.25, outerRadius: 0.5, height: 1.0)
         }
         //Add random color to shape
-        geometry.materials.first?.diffuse.contents = UIColor.random()
+       // geometry.materials.first?.diffuse.contents = UIColor.random()
+        
+        let color = UIColor.random()
+        geometry.materials.first?.diffuse.contents = color
         
         let geometryNode = SCNNode(geometry: geometry)
         
-        scnScene.rootNode.addChildNode(geometryNode)
         
         //Create physics to shapes adding force
         geometryNode.physicsBody = SCNPhysicsBody(type: .Dynamic, shape: nil)
@@ -99,6 +107,17 @@ class GameViewController: UIViewController {
         geometryNode.physicsBody?.applyForce(force, atPosition: position,
                                              impulse: true)
         
+        let trailEmitter = createTrail(color, geometry: geometry)
+        geometryNode.addParticleSystem(trailEmitter)
+        
+        if color == UIColor.blackColor() {
+            geometryNode.name = "BAD"
+            game.playSound(scnScene.rootNode, name: "SpawnBad")
+        } else {
+            geometryNode.name = "GOOD"
+            game.playSound(scnScene.rootNode, name: "SpawnGood")
+        }
+        scnScene.rootNode.addChildNode(geometryNode)
     }
     
     //Remove node-child after object reach out of bounds
@@ -110,7 +129,152 @@ class GameViewController: UIViewController {
                 // 3
                 node.removeFromParentNode()
             }
-        } }
+        }
+    }
+    
+    // 1
+    func createTrail(color: UIColor, geometry: SCNGeometry) ->
+        SCNParticleSystem {
+            // 2
+            let trail = SCNParticleSystem(named: "Trail.scnp", inDirectory: nil)!
+            // 3
+            trail.particleColor = color
+            // 4
+            trail.emitterShape = geometry
+            // 5
+            return trail
+    }
+    
+    func setupHUD() {
+        game.hudNode.position = SCNVector3(x: 0.0, y: 10.0, z: 0.0)
+        scnScene.rootNode.addChildNode(game.hudNode)
+    }
+    
+    func createSplash(name:String, imageFileName:String) -> SCNNode {
+        let plane = SCNPlane(width: 5, height: 5)
+        let splashNode = SCNNode(geometry: plane)
+        splashNode.position = SCNVector3(x: 0, y: 5, z: 0)
+        splashNode.name = name
+        splashNode.geometry?.materials.first?.diffuse.contents = imageFileName
+        scnScene.rootNode.addChildNode(splashNode)
+        return splashNode
+    }
+    func showSplash(splashName:String) {
+        for (name,node) in splashNodes {
+            if name == splashName {
+                node.hidden = false
+            } else {
+                node.hidden = true
+            }
+        }
+    }
+    
+    func setupSplash() {
+        splashNodes["TapToPlay"] = createSplash("TAPTOPLAY",
+                                                imageFileName: "GeometryFighter.scnassets/Textures/TapToPlay_Diffuse.png")
+        splashNodes["GameOver"] = createSplash("GAMEOVER",
+                                               imageFileName: "GeometryFighter.scnassets/Textures/GameOver_Diffuse.png")
+        showSplash("TapToPlay")
+    }
+    
+    func setupSounds() {
+        game.loadSound("ExplodeGood",
+                       fileNamed: "GeometryFighter.scnassets/Sounds/ExplodeGood.wav")
+        game.loadSound("SpawnGood",
+                       fileNamed: "GeometryFighter.scnassets/Sounds/SpawnGood.wav")
+        game.loadSound("ExplodeBad",
+                       fileNamed: "GeometryFighter.scnassets/Sounds/ExplodeBad.wav")
+        game.loadSound("SpawnBad",
+                       fileNamed: "GeometryFighter.scnassets/Sounds/SpawnBad.wav")
+        game.loadSound("GameOver",
+                       fileNamed: "GeometryFighter.scnassets/Sounds/GameOver.wav")
+    }
+    
+
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        
+        if game.state == .GameOver {
+            return
+        }
+        
+        if game.state == .TapToPlay {
+            game.reset()
+            game.state = .Playing
+            showSplash("")
+            return
+        }
+        
+        let touch = touches.first
+        let location = touch!.locationInView(scnView)
+        let hitResults = scnView.hitTest(location, options: nil)
+        
+        if hitResults.count > 0 {
+            
+            let result: AnyObject! = hitResults[0]
+            
+            if result.node.name == "HUD" ||
+                result.node.name == "GAMEOVER" ||
+                result.node.name == "TAPTOPLAY" {
+                return
+            } else if result.node.name == "GOOD" {
+                handleGoodCollision()
+            } else if result.node.name == "BAD" {
+                handleBadCollision()
+            }
+            
+            createExplosion(result.node.geometry!,
+                            position: result.node.presentationNode.position,
+                            rotation: result.node.presentationNode.rotation)
+            
+            result.node.removeFromParentNode()
+        }
+    }
+    
+    func handleGoodCollision() {
+        game.score += 1
+        game.playSound(scnScene.rootNode, name: "ExplodeGood")
+    }
+    
+    func handleBadCollision() {
+        game.lives -= 1
+        game.playSound(scnScene.rootNode, name: "ExplodeBad")
+        game.shakeNode(cameraNode)
+        
+        if game.lives <= 0 {
+            game.saveState()
+            showSplash("GameOver")
+            game.playSound(scnScene.rootNode, name: "GameOver")
+            game.state = .GameOver
+            scnScene.rootNode.runAction(SCNAction.waitForDurationThenRunBlock(5) { (node:SCNNode!) -> Void in
+                self.showSplash("TapToPlay")
+                self.game.state = .TapToPlay
+                })
+        }
+    }
+
+    // 1
+    func createExplosion(geometry: SCNGeometry, position: SCNVector3,
+                         rotation: SCNVector4) {
+        // 2
+        let explosion =
+            SCNParticleSystem(named: "Explode.scnp", inDirectory:
+                nil)!
+        explosion.emitterShape = geometry
+        explosion.birthLocation = .Surface
+        // 3
+        let rotationMatrix =
+            SCNMatrix4MakeRotation(rotation.w, rotation.x,
+                                   rotation.y, rotation.z)
+        let translationMatrix =
+            SCNMatrix4MakeTranslation(position.x, position.y,
+                                      position.z)
+        let transformMatrix =
+            SCNMatrix4Mult(rotationMatrix, translationMatrix)
+        // 4
+        scnScene.addParticleSystem(explosion, withTransform:
+            transformMatrix)
+    }
     
 }
 
@@ -127,7 +291,7 @@ extension GameViewController: SCNSceneRendererDelegate {
             spawnTime = time + NSTimeInterval(Float.random(min: 0.2, max: 1.5))
         }
         cleanScene()
-
+        game.updateHUD()
     }
 }
 

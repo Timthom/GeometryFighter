@@ -21,6 +21,9 @@
 		7F63CAA51D7F157300C8AC92 /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F63CA9E1D7F157300C8AC92 /* Int+Extensions.swift */; };
 		7F63CAA61D7F157300C8AC92 /* SCNAction+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F63CA9F1D7F157300C8AC92 /* SCNAction+Extensions.swift */; };
 		7F63CAA71D7F157300C8AC92 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F63CAA01D7F157300C8AC92 /* UIColor+Extensions.swift */; };
+		7F63CAAB1D7F375600C8AC92 /* Trail.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 7F63CAA91D7F375600C8AC92 /* Trail.scnp */; };
+		7F63CAAC1D7F375600C8AC92 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F63CAAA1D7F375600C8AC92 /* spark.png */; };
+		7F76769C1D7F520300DAA179 /* Explode.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 7F76769B1D7F520300DAA179 /* Explode.scnp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +43,9 @@
 		7F63CA9E1D7F157300C8AC92 /* Int+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		7F63CA9F1D7F157300C8AC92 /* SCNAction+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SCNAction+Extensions.swift"; sourceTree = "<group>"; };
 		7F63CAA01D7F157300C8AC92 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		7F63CAA91D7F375600C8AC92 /* Trail.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Trail.scnp; sourceTree = "<group>"; };
+		7F63CAAA1D7F375600C8AC92 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		7F76769B1D7F520300DAA179 /* Explode.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Explode.scnp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +78,7 @@
 		7F63CA7C1D7EDBA400C8AC92 /* GeometryFighter */ = {
 			isa = PBXGroup;
 			children = (
+				7F63CAA81D7F36D700C8AC92 /* Particles */,
 				7F63CA991D7F157300C8AC92 /* GameUtils */,
 				7F63CA911D7EEB4B00C8AC92 /* GeometryFighter.scnassets */,
 				7F63CA7D1D7EDBA400C8AC92 /* AppDelegate.swift */,
@@ -97,6 +104,16 @@
 				7F63CAA01D7F157300C8AC92 /* UIColor+Extensions.swift */,
 			);
 			path = GameUtils;
+			sourceTree = "<group>";
+		};
+		7F63CAA81D7F36D700C8AC92 /* Particles */ = {
+			isa = PBXGroup;
+			children = (
+				7F76769B1D7F520300DAA179 /* Explode.scnp */,
+				7F63CAA91D7F375600C8AC92 /* Trail.scnp */,
+				7F63CAAA1D7F375600C8AC92 /* spark.png */,
+			);
+			name = Particles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,9 +175,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F63CAAB1D7F375600C8AC92 /* Trail.scnp in Resources */,
+				7F63CAAC1D7F375600C8AC92 /* spark.png in Resources */,
 				7F63CA8A1D7EDBA400C8AC92 /* LaunchScreen.storyboard in Resources */,
 				7F63CA871D7EDBA400C8AC92 /* Assets.xcassets in Resources */,
 				7F63CA851D7EDBA400C8AC92 /* Main.storyboard in Resources */,
+				7F76769C1D7F520300DAA179 /* Explode.scnp in Resources */,
 				7F63CA921D7EEB4B00C8AC92 /* GeometryFighter.scnassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +359,7 @@
 				7F63CA901D7EDBA400C8AC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
